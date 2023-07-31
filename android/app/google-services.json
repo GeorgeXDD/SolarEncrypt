@@ -1,0 +1,82 @@
+{
+  "project_info": {
+    "project_number": "159808517268",
+    "project_id": "solarencrypt-18c58",
+    "storage_bucket": "solarencrypt-18c58.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:159808517268:android:9e1544c663130464c83081",
+        "android_client_info": {
+          "package_name": "com.example.firstapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "159808517268-imi4tbfgdbk4j19u795rmjkk5djl2jki.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAWLJ4Mj5iE4S1lwNVO7qv5vJFZ9WbafF4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "159808517268-imi4tbfgdbk4j19u795rmjkk5djl2jki.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "159808517268-1uhgod0lvd1basmdhtviub0lideravn3.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.firstapp.RunnerTests"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:159808517268:android:000667d9fd54284ac83081",
+        "android_client_info": {
+          "package_name": "com.example.solarencrypt"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "159808517268-imi4tbfgdbk4j19u795rmjkk5djl2jki.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAWLJ4Mj5iE4S1lwNVO7qv5vJFZ9WbafF4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "159808517268-imi4tbfgdbk4j19u795rmjkk5djl2jki.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "159808517268-1uhgod0lvd1basmdhtviub0lideravn3.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.firstapp.RunnerTests"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

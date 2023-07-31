@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>159808517268-aicgq30l00n8bp9sbeulg48ng60ndql1.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.159808517268-aicgq30l00n8bp9sbeulg48ng60ndql1</string>
+	<key>API_KEY</key>
+	<string>AIzaSyAnoytUJIypws_dX88OL7CjoeeTO5fgi30</string>
+	<key>GCM_SENDER_ID</key>
+	<string>159808517268</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.example.solarencrypt.RunnerTests</string>
+	<key>PROJECT_ID</key>
+	<string>solarencrypt-18c58</string>
+	<key>STORAGE_BUCKET</key>
+	<string>solarencrypt-18c58.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:159808517268:ios:161ff2afbaa81e79c83081</string>
+</dict>
+</plist>
