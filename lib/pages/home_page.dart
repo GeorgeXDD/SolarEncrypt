@@ -54,6 +54,16 @@ class _HomePageState extends State<HomePage> {
         backgroundColor: Color.fromARGB(255, 223, 107, 30),
       ),
       drawer: NavigationDrawer(user: user),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text('Welcome, ${user.email}!'),
+            SizedBox(height: 20),
+            // Add any additional widgets or functionality here
+          ],
+        ),
+      ),
     );
   }
 }
