@@ -1,5 +1,6 @@
 // ignore_for_file: prefer_interpolation_to_compose_strings, prefer_const_constructors, empty_constructor_bodies
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -60,7 +61,6 @@ class _HomePageState extends State<HomePage> {
           children: [
             Text('Welcome, ${user.email}!'),
             SizedBox(height: 20),
-            // Add any additional widgets or functionality here
           ],
         ),
       ),
@@ -83,6 +83,19 @@ class NavigationDrawer extends StatelessWidget {
     );
   }
 
+  Future<String?> fetchUsername() async {
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+        .collection('users')
+        .where('email', isEqualTo: user.email)
+        .get();
+
+    if (querySnapshot.docs.isNotEmpty) {
+      return querySnapshot.docs.first['username'];
+    }
+
+    return null;
+  }
+
   Widget buildHeader(BuildContext context) => Material(
       color: Color.fromARGB(255, 53, 52, 52),
       child: InkWell(
@@ -100,9 +113,16 @@ class NavigationDrawer extends StatelessWidget {
                         'https://img.freepik.com/free-photo/waist-up-portrait-handsome-serious-unshaven-male-keeps-hands-together-dressed-dark-blue-shirt-has-talk-with-interlocutor-stands-against-white-wall-self-confident-man-freelancer_273609-16320.jpg'),
                   ),
                   SizedBox(height: 20),
-                  Text(
-                    'Welcome user!',
-                    style: TextStyle(fontSize: 28, color: Colors.white),
+                  FutureBuilder<String?>(
+                    future: fetchUsername(),
+                    builder: (context, snapshot) {
+                      String welcomeText = snapshot.data ?? 'Welcome user!';
+
+                      return Text(
+                        welcomeText,
+                        style: TextStyle(fontSize: 28, color: Colors.white),
+                      );
+                    },
                   ),
                   SizedBox(height: 5),
                   Text(
@@ -136,8 +156,8 @@ class NavigationDrawer extends StatelessWidget {
               ),
             ),
             ListTile(
-              leading: const Icon(Icons.favorite_border),
-              title: const Text('Favourites'),
+              leading: const Icon(Icons.chat_outlined),
+              title: const Text('Chat'),
               onTap: () => Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(builder: (context) => WelcomePage()),
@@ -149,8 +169,13 @@ class NavigationDrawer extends StatelessWidget {
               onTap: () {},
             ),
             ListTile(
-              leading: const Icon(Icons.update),
-              title: const Text('Update solar panels'),
+              leading: const Icon(Icons.control_camera),
+              title: const Text('Control Panel'),
+              onTap: () {},
+            ),
+            ListTile(
+              leading: const Icon(Icons.radar),
+              title: const Text('Radar local area'),
               onTap: () {},
             ),
           ],
