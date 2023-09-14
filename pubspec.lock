@@ -89,6 +89,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.5"
+  event_bus:
+    dependency: transitive
+    description:
+      name: event_bus
+      sha256: "44baa799834f4c803921873e7446a2add0f3efa45e101a054b1f0ab9b95f8edc"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.0"
   fake_async:
     dependency: transitive
     description:
@@ -174,6 +182,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.2"
+  flutter_mqtt:
+    dependency: "direct main"
+    description:
+      name: flutter_mqtt
+      sha256: "68d5977fd9e91d88501bcd7d72629a55520dec6cca6f99b5d9d0812600a039c0"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.0+5"
   flutter_rating_bar:
     dependency: "direct main"
     description:
@@ -192,6 +208,14 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_xtransport:
+    dependency: transitive
+    description:
+      name: flutter_xtransport
+      sha256: ba282715281908c57d20d5a5e7c2579533ac7456fb37dec28b0f59e419dfa282
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.4+1"
   google_fonts:
     dependency: "direct main"
     description:
@@ -256,6 +280,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.9.1"
+  mqtt_client:
+    dependency: "direct main"
+    description:
+      name: mqtt_client
+      sha256: "873c124f6485c17b5ca085047880068f3c5acc9db54317995d752a3253f95a72"
+      url: "https://pub.dev"
+    source: hosted
+    version: "10.0.0"
   nested:
     dependency: transitive
     description:

@@ -1,7 +1,9 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'package:provider/provider.dart';
 import 'package:solarencrypt/firebase_options.dart';
 
 import 'package:flutter/material.dart';
+import 'package:solarencrypt/services/MQTTAppState.dart';
 
 import 'auth/check_page.dart';
 
@@ -10,7 +12,15 @@ Future<void> main() async {
 
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
-  runApp(const MyApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        // Define your MQTTAppState provider here
+        ChangeNotifierProvider(create: (_) => MQTTAppState()),
+      ],
+      child: MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {

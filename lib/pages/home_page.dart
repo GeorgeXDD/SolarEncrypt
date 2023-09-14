@@ -1,8 +1,13 @@
 // ignore_for_file: prefer_interpolation_to_compose_strings, prefer_const_constructors, empty_constructor_bodies
 
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:mqtt_client/mqtt_client.dart';
+import 'package:mqtt_client/mqtt_server_client.dart';
+import 'package:solarencrypt/pages/sensors_page.dart';
 
 import 'welcome_page.dart';
 
@@ -13,38 +18,19 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-// class _HomePageState extends State<HomePage> {
-//   final user = FirebaseAuth.instance.currentUser!;
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//         appBar: AppBar(
-//           title: const Text('Home'),
-//           backgroundColor: Color.fromARGB(255, 223, 107, 30),
-//         ),
-//         body: Center(
-//             child: Column(
-//           mainAxisAlignment: MainAxisAlignment.center,
-//           children: [
-//             Text('Signed in as: ' + user.email!),
-//             MaterialButton(
-//               onPressed: () {
-//                 FirebaseAuth.instance.signOut();
-//                 Navigator.pushReplacement(
-//                   context,
-//                   MaterialPageRoute(builder: (context) => WelcomePage()),
-//                 );
-//               },
-//               color: Color.fromARGB(255, 223, 107, 30),
-//               child: Text('Sign Out'),
-//             )
-//           ],
-//         )));
-//   }
-// }
-
 class _HomePageState extends State<HomePage> {
+  // late MqttService mqttService;
+
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   final MqttServerClient client =
+  //       MqttServerClient('localhost', ''); // Use MqttServerClient
+  //   client.port = 1883; // Port number
+  //   mqttService = MqttService(client: client, topic: 'sensor_data');
+  //   mqttService.connect();
+  // }
+
   final user = FirebaseAuth.instance.currentUser!;
 
   @override
@@ -61,6 +47,27 @@ class _HomePageState extends State<HomePage> {
           children: [
             Text('Welcome, ${user.email}!'),
             SizedBox(height: 20),
+            // StreamBuilder<String>(
+            //   stream: mqttService
+            //       .mqttDataStream, // Replace with your MQTT data stream
+            //   builder: (context, snapshot) {
+            //     if (snapshot.hasData) {
+            //       print('Received data: ${snapshot.data}');
+            //       Map<String, dynamic> data = jsonDecode(snapshot.data!);
+            //       temperature = data['temperature'].toString();
+            //       humidity = data['humidity'].toString();
+
+            //       return Column(
+            //         children: [
+            //           Text('Temperature: $temperature°C'),
+            //           Text('Humidity: $humidity%'),
+            //         ],
+            //       );
+            //     } else {
+            //       return Text('Waiting for data...');
+            //     }
+            //   },
+            // ),
           ],
         ),
       ),
@@ -166,7 +173,10 @@ class NavigationDrawer extends StatelessWidget {
             ListTile(
               leading: const Icon(Icons.workspaces_outline),
               title: const Text('Sensors'),
-              onTap: () {},
+              onTap: () => Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => SensorsPage()),
+              ),
             ),
             ListTile(
               leading: const Icon(Icons.control_camera),
