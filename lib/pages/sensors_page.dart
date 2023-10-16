@@ -1,7 +1,5 @@
 // ignore_for_file: sort_child_properties_last
 
-import 'dart:io';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -44,8 +42,8 @@ class _SensorsPageState extends State<SensorsPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Sensors Page'),
-        backgroundColor: Color.fromARGB(255, 223, 107, 30),
+        title: const Text('Sensors Page'),
+        backgroundColor: const Color.fromARGB(255, 223, 107, 30),
         titleSpacing: 00.0,
         centerTitle: true,
         toolbarHeight: 60.2,
@@ -172,16 +170,16 @@ class _SensorsPageState extends State<SensorsPage> {
           Container(
             width: 400,
             height: 60,
-            margin: EdgeInsets.symmetric(vertical: 5),
+            margin: const EdgeInsets.symmetric(vertical: 5),
             decoration: BoxDecoration(
-              color: Color.fromARGB(255, 223, 107, 30),
+              color: const Color.fromARGB(255, 223, 107, 30),
               border: Border.all(color: Colors.black),
               borderRadius: BorderRadius.circular(5),
             ),
             child: Center(
               child: Text(
                 line,
-                style: TextStyle(fontSize: 18, color: Colors.white),
+                style: const TextStyle(fontSize: 18, color: Colors.white),
               ),
             ),
           ),
@@ -199,17 +197,18 @@ class _SensorsPageState extends State<SensorsPage> {
         children: <Widget>[
           SingleChildScrollView(
             child: Column(
-              children:
-                  dataWidgets.isNotEmpty ? dataWidgets : [Text('No data')],
+              children: dataWidgets.isNotEmpty
+                  ? dataWidgets
+                  : [const Text('No data')],
             ),
           ),
           const SizedBox(height: 20),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
-              primary: Color.fromARGB(255, 223, 107, 30),
+              primary: const Color.fromARGB(255, 223, 107, 30),
             ),
             onPressed: _clearHistoryText,
-            child: Text('Clear History'),
+            child: const Text('Clear History'),
           ),
         ],
       ),
@@ -288,91 +287,117 @@ class NavigationDrawer extends StatelessWidget {
   }
 
   Widget buildHeader(BuildContext context) => Material(
-      color: Color.fromARGB(255, 53, 52, 52),
-      child: InkWell(
+        color: const Color.fromARGB(255, 53, 52, 52),
+        borderRadius: const BorderRadius.only(
+          bottomRight: Radius.circular(20.0),
+        ),
+        child: InkWell(
           onTap: () {
             Navigator.pop(context);
           },
           child: Container(
-              padding: EdgeInsets.only(
-                  top: 24 + MediaQuery.of(context).padding.top, bottom: 24),
-              child: Column(
-                children: [
-                  CircleAvatar(
+            padding: EdgeInsets.only(
+              top: 24 + MediaQuery.of(context).padding.top,
+              bottom: 24,
+            ),
+            child: Column(
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(100.0),
+                  child: const CircleAvatar(
                     radius: 42,
                     backgroundImage: NetworkImage(
                         'https://img.freepik.com/free-photo/waist-up-portrait-handsome-serious-unshaven-male-keeps-hands-together-dressed-dark-blue-shirt-has-talk-with-interlocutor-stands-against-white-wall-self-confident-man-freelancer_273609-16320.jpg'),
                   ),
-                  SizedBox(height: 20),
-                  FutureBuilder<String?>(
-                    future: fetchUsername(),
-                    builder: (context, snapshot) {
-                      String welcomeText = snapshot.data ?? 'Welcome user!';
-
-                      return Text(
-                        welcomeText,
-                        style: TextStyle(fontSize: 28, color: Colors.white),
-                      );
-                    },
-                  ),
-                  SizedBox(height: 5),
-                  Text(
-                    user.email!,
-                    style: TextStyle(fontSize: 16, color: Colors.white),
-                  ),
-                  SizedBox(height: 10),
-                  MaterialButton(
+                ),
+                const SizedBox(height: 20),
+                FutureBuilder<String?>(
+                  future: fetchUsername(),
+                  builder: (context, snapshot) {
+                    String welcomeText = snapshot.data ?? 'Welcome user!';
+                    return Text(
+                      welcomeText,
+                      style: const TextStyle(fontSize: 28, color: Colors.white),
+                    );
+                  },
+                ),
+                const SizedBox(height: 5),
+                Text(
+                  user.email!,
+                  style: const TextStyle(fontSize: 16, color: Colors.white),
+                ),
+                const SizedBox(height: 10),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(30.0),
+                  child: MaterialButton(
                     onPressed: () {
                       FirebaseAuth.instance.signOut();
                       Navigator.pushReplacement(
                         context,
-                        MaterialPageRoute(builder: (context) => WelcomePage()),
+                        MaterialPageRoute(
+                            builder: (context) => const WelcomePage()),
                       );
                     },
-                    color: Color.fromARGB(255, 223, 107, 30),
-                    child: Text('Sign Out'),
-                  )
-                ],
-              ))));
+                    color: const Color.fromARGB(255, 223, 107, 30),
+                    child: const Text('Sign Out'),
+                  ),
+                )
+              ],
+            ),
+          ),
+        ),
+      );
+
   Widget buildMenuItems(BuildContext context) => Container(
         padding: const EdgeInsets.all(24),
-        child: Wrap(
-          children: [
-            ListTile(
-              leading: const Icon(Icons.home_outlined),
-              title: const Text('Home'),
-              onTap: () => Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => HomePage()),
+        child: ClipRRect(
+          borderRadius: const BorderRadius.only(
+            bottomRight: Radius.circular(20.0),
+          ),
+          child: Wrap(
+            children: [
+              ListTile(
+                leading: const Icon(Icons.home_outlined),
+                title: const Text('Home'),
+                onTap: () => Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => const HomePage()),
+                ),
               ),
-            ),
-            ListTile(
-              leading: const Icon(Icons.chat_outlined),
-              title: const Text('Chat'),
-              onTap: () => Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => WelcomePage()),
+              ListTile(
+                leading: const Icon(Icons.chat_outlined),
+                title: const Text('Chat'),
+                onTap: () => Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => const WelcomePage()),
+                ),
               ),
-            ),
-            ListTile(
-              leading: const Icon(Icons.workspaces_outline),
-              title: const Text('Sensors'),
-              onTap: () => Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => SensorsPage()),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(20.0),
+                child: Container(
+                  color: Color.fromARGB(255, 223, 107, 30),
+                  child: ListTile(
+                    leading: const Icon(Icons.workspaces_outline),
+                    title: const Text('Sensors'),
+                    onTap: () => Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (context) => SensorsPage()),
+                    ),
+                  ),
+                ),
               ),
-            ),
-            ListTile(
-              leading: const Icon(Icons.control_camera),
-              title: const Text('Control Panel'),
-              onTap: () {},
-            ),
-            ListTile(
-              leading: const Icon(Icons.radar),
-              title: const Text('Radar local area'),
-              onTap: () {},
-            ),
-          ],
+              ListTile(
+                leading: const Icon(Icons.control_camera),
+                title: const Text('Control Panel'),
+                onTap: () {},
+              ),
+              ListTile(
+                leading: const Icon(Icons.radar),
+                title: const Text('Radar local area'),
+                onTap: () {},
+              ),
+            ],
+          ),
         ),
       );
 }

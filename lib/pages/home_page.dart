@@ -34,16 +34,148 @@ class _HomePageState extends State<HomePage> {
         elevation: 0.00,
       ),
       drawer: NavigationDrawer(user: user),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text('Welcome, ${user.email}!'),
-            SizedBox(height: 20),
-          ],
-        ),
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Container(
+            margin: EdgeInsets.only(top: 30),
+            child: FutureBuilder<String?>(
+              future: fetchUsername(),
+              builder: (context, snapshot) {
+                String username = snapshot.data ?? user.email!;
+                return RichText(
+                  text: TextSpan(
+                    style: DefaultTextStyle.of(context).style,
+                    children: <TextSpan>[
+                      TextSpan(
+                        text: 'Welcome, ',
+                        style: TextStyle(
+                          color: Color.fromARGB(255, 223, 107, 30),
+                          fontSize: 22,
+                        ),
+                      ),
+                      TextSpan(
+                        text: '$username!',
+                        style: TextStyle(
+                          color: Color.fromARGB(255, 223, 107, 30),
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+          ),
+          SizedBox(height: 20),
+          Image.asset(
+            'assets/solarpanel_home2.jpg',
+            width: double.infinity,
+            height: 200,
+          ),
+          SizedBox(height: 30),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => SensorsPage()),
+                  );
+                },
+                child: Container(
+                  margin: EdgeInsets.only(left: 30),
+                  width: 150,
+                  height: 150,
+                  decoration: BoxDecoration(
+                    color: Color.fromARGB(255, 223, 107, 30),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: const [
+                        Icon(
+                          Icons.solar_power,
+                          color: Colors.white,
+                          size: 70,
+                        ),
+                        SizedBox(height: 10),
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 20),
+                          child: Text(
+                            'Connect to your solar panel',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 15,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => SensorsPage()),
+                  );
+                },
+                child: Container(
+                  margin: EdgeInsets.only(right: 30),
+                  width: 150,
+                  height: 150,
+                  decoration: BoxDecoration(
+                    color: Color.fromARGB(255, 223, 107, 30),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: const [
+                        Icon(
+                          Icons.solar_power,
+                          color: Colors.white,
+                          size: 70,
+                        ),
+                        SizedBox(height: 10),
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 20),
+                          child: Text(
+                            'Connect to your solar panel',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 15,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
+  }
+
+  Future<String?> fetchUsername() async {
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+        .collection('users')
+        .where('email', isEqualTo: user.email)
+        .get();
+
+    if (querySnapshot.docs.isNotEmpty) {
+      return querySnapshot.docs.first['username'];
+    }
+
+    return null;
   }
 }
 
@@ -76,62 +208,76 @@ class NavigationDrawer extends StatelessWidget {
   }
 
   Widget buildHeader(BuildContext context) => Material(
-      color: Color.fromARGB(255, 53, 52, 52),
-      child: InkWell(
+        color: Color.fromARGB(255, 53, 52, 52),
+        child: InkWell(
           onTap: () {
             Navigator.pop(context);
           },
           child: Container(
-              padding: EdgeInsets.only(
-                  top: 24 + MediaQuery.of(context).padding.top, bottom: 24),
-              child: Column(
-                children: [
-                  CircleAvatar(
-                    radius: 42,
-                    backgroundImage: NetworkImage(
-                        'https://img.freepik.com/free-photo/waist-up-portrait-handsome-serious-unshaven-male-keeps-hands-together-dressed-dark-blue-shirt-has-talk-with-interlocutor-stands-against-white-wall-self-confident-man-freelancer_273609-16320.jpg'),
-                  ),
-                  SizedBox(height: 20),
-                  FutureBuilder<String?>(
-                    future: fetchUsername(),
-                    builder: (context, snapshot) {
-                      String welcomeText = snapshot.data ?? 'Welcome user!';
+            padding: EdgeInsets.only(
+                top: 24 + MediaQuery.of(context).padding.top, bottom: 24),
+            child: Column(
+              children: [
+                CircleAvatar(
+                  radius: 42,
+                  backgroundImage: NetworkImage(
+                      'https://img.freepik.com/free-photo/waist-up-portrait-handsome-serious-unshaven-male-keeps-hands-together-dressed-dark-blue-shirt-has-talk-with-interlocutor-stands-against-white-wall-self-confident-man-freelancer_273609-16320.jpg'),
+                ),
+                SizedBox(height: 20),
+                FutureBuilder<String?>(
+                  future: fetchUsername(),
+                  builder: (context, snapshot) {
+                    String welcomeText = snapshot.data ?? 'Welcome user!';
 
-                      return Text(
-                        welcomeText,
-                        style: TextStyle(fontSize: 28, color: Colors.white),
-                      );
-                    },
-                  ),
-                  SizedBox(height: 5),
-                  Text(
-                    user.email!,
-                    style: TextStyle(fontSize: 16, color: Colors.white),
-                  ),
-                  SizedBox(height: 10),
-                  MaterialButton(
+                    return Text(
+                      welcomeText,
+                      style: TextStyle(fontSize: 28, color: Colors.white),
+                    );
+                  },
+                ),
+                SizedBox(height: 5),
+                Text(
+                  user.email!,
+                  style: TextStyle(fontSize: 16, color: Colors.white),
+                ),
+                SizedBox(height: 10),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(30.0),
+                  child: MaterialButton(
                     onPressed: () {
                       FirebaseAuth.instance.signOut();
                       Navigator.pushReplacement(
                         context,
-                        MaterialPageRoute(builder: (context) => WelcomePage()),
+                        MaterialPageRoute(
+                            builder: (context) => const WelcomePage()),
                       );
                     },
-                    color: Color.fromARGB(255, 223, 107, 30),
-                    child: Text('Sign Out'),
-                  )
-                ],
-              ))));
+                    color: const Color.fromARGB(255, 223, 107, 30),
+                    child: const Text('Sign Out'),
+                  ),
+                )
+              ],
+            ),
+          ),
+        ),
+      );
+
   Widget buildMenuItems(BuildContext context) => Container(
         padding: const EdgeInsets.all(24),
         child: Wrap(
           children: [
-            ListTile(
-              leading: const Icon(Icons.home_outlined),
-              title: const Text('Home'),
-              onTap: () => Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => HomePage()),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(20.0),
+              child: Container(
+                color: Color.fromARGB(255, 223, 107, 30),
+                child: ListTile(
+                  leading: const Icon(Icons.home_outlined),
+                  title: const Text('Home'),
+                  onTap: () => Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => HomePage()),
+                  ),
+                ),
               ),
             ),
             ListTile(

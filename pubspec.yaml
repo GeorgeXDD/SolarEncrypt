@@ -73,6 +73,8 @@ flutter:
     - assets/bg.png
     - assets/bgtest.png
     - assets/bgtest2.png
+    - assets/solarpanel_home.jpg
+    - assets/solarpanel_home2.jpg
 
 
   # To add assets to your application, add an assets section, like this:
