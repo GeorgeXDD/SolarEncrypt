@@ -22,7 +22,7 @@ class _SensorsPageState extends State<SensorsPage> {
   final TextEditingController _hostTextController = TextEditingController();
   final TextEditingController _topicTextController = TextEditingController();
   late MQTTAppState currentAppState;
-  late MQTTManager manager;
+  List<MQTTManager> managers = [];
 
   @override
   void initState() {
@@ -31,6 +31,7 @@ class _SensorsPageState extends State<SensorsPage> {
 
   @override
   void dispose() {
+    _disconnect();
     _hostTextController.dispose();
     _topicTextController.dispose();
     super.dispose();
@@ -44,13 +45,23 @@ class _SensorsPageState extends State<SensorsPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Sensors Page'),
-        backgroundColor: Colors.greenAccent,
+        backgroundColor: Color.fromARGB(255, 223, 107, 30),
+        titleSpacing: 00.0,
+        centerTitle: true,
+        toolbarHeight: 60.2,
+        toolbarOpacity: 0.8,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+              bottomRight: Radius.circular(25),
+              bottomLeft: Radius.circular(25)),
+        ),
+        elevation: 0.00,
       ),
       drawer: NavigationDrawer(user: user),
-      body: Column(
+      body: ListView(
         children: <Widget>[
-          _buildConnectionStateText(
-              _prepareStateMessageFrom(currentAppState.getAppConnectionState)),
+          // _buildConnectionStateText(
+          //     _prepareStateMessageFrom(currentAppState.getAppConnectionState)),
           _buildEditableColumn(),
           _buildScrollableTextWith(currentAppState.getHistoryText),
         ],
@@ -112,24 +123,24 @@ class _SensorsPageState extends State<SensorsPage> {
             ),
             child: const Text('Disconnect'),
             onPressed:
-                state == MQTTAppConnectionState.connected ? _disconnect : null,
+                state == MQTTAppConnectionState.connecting ? _disconnect : null,
           ),
         ),
       ],
     );
   }
 
-  Widget _buildConnectionStateText(String status) {
-    return Row(
-      children: <Widget>[
-        Expanded(
-          child: Container(
-              color: Colors.deepOrangeAccent,
-              child: Text(status, textAlign: TextAlign.center)),
-        ),
-      ],
-    );
-  }
+  // Widget _buildConnectionStateText(String status) {
+  //   return Row(
+  //     children: <Widget>[
+  //       Expanded(
+  //         child: Container(
+  //             color: Colors.deepOrangeAccent,
+  //             child: Text(status, textAlign: TextAlign.center)),
+  //       ),
+  //     ],
+  //   );
+  // }
 
   Widget _buildTextFieldWith(TextEditingController controller, String hintText,
       MQTTAppConnectionState state) {
@@ -151,24 +162,53 @@ class _SensorsPageState extends State<SensorsPage> {
   }
 
   Widget _buildScrollableTextWith(String text) {
+    List<Widget> dataWidgets = [];
+
+    List<String> lines = text.split('\n');
+
+    for (String line in lines) {
+      if (line.trim().isNotEmpty) {
+        dataWidgets.add(
+          Container(
+            width: 400,
+            height: 60,
+            margin: EdgeInsets.symmetric(vertical: 5),
+            decoration: BoxDecoration(
+              color: Color.fromARGB(255, 223, 107, 30),
+              border: Border.all(color: Colors.black),
+              borderRadius: BorderRadius.circular(5),
+            ),
+            child: Center(
+              child: Text(
+                line,
+                style: TextStyle(fontSize: 18, color: Colors.white),
+              ),
+            ),
+          ),
+        );
+      }
+    }
+
+    if (dataWidgets.length > 3) {
+      dataWidgets = dataWidgets.sublist(dataWidgets.length - 3);
+    }
+
     return Padding(
       padding: const EdgeInsets.all(20.0),
       child: Column(
         children: <Widget>[
-          Container(
-            width: 400,
-            height: 200,
-            child: SingleChildScrollView(
-              child: Text(text),
+          SingleChildScrollView(
+            child: Column(
+              children:
+                  dataWidgets.isNotEmpty ? dataWidgets : [Text('No data')],
             ),
           ),
           const SizedBox(height: 20),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
-              primary: Colors.blue, // Customize the button's color
+              primary: Color.fromARGB(255, 223, 107, 30),
             ),
-            onPressed:
-                _clearHistoryText, // Bind this to the function to clear the text
+            onPressed: _clearHistoryText,
             child: Text('Clear History'),
           ),
         ],
@@ -177,9 +217,7 @@ class _SensorsPageState extends State<SensorsPage> {
   }
 
   void _clearHistoryText() {
-    // Call a function to clear the history text in your MQTTAppState or perform any other necessary actions
-    currentAppState
-        .clearHistoryText(); // You should implement this method in your MQTTAppState class
+    currentAppState.clearHistoryText();
   }
 
   String _prepareStateMessageFrom(MQTTAppConnectionState state) {
@@ -194,21 +232,30 @@ class _SensorsPageState extends State<SensorsPage> {
   }
 
   void _configureAndConnect() {
-    String osPrefix = 'Flutter_iOS';
-    if (Platform.isAndroid) {
-      osPrefix = 'Flutter_Android';
+    String host = _hostTextController.text;
+    String topic = 'test/' + _topicTextController.text + '/current';
+
+    MQTTManager manager = MQTTManager(state: currentAppState);
+
+    manager.initializeMQTTClient(topic: topic, identifier: 'identifier');
+
+    managers.add(manager);
+
+    _connectAllManagers();
+
+    currentAppState.setAppConnectionState(MQTTAppConnectionState.connecting);
+  }
+
+  void _connectAllManagers() async {
+    for (var manager in managers) {
+      await manager.connectAll();
     }
-    manager = MQTTManager(
-        host: _hostTextController.text,
-        topic: _topicTextController.text,
-        identifier: osPrefix,
-        state: currentAppState);
-    manager.initializeMQTTClient();
-    manager.connect();
   }
 
   void _disconnect() {
-    manager.disconnect();
+    for (var manager in managers) {
+      manager.disconnectAll();
+    }
   }
 }
 

@@ -1,12 +1,7 @@
 // ignore_for_file: prefer_interpolation_to_compose_strings, prefer_const_constructors, empty_constructor_bodies
-
-import 'dart:convert';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:mqtt_client/mqtt_client.dart';
-import 'package:mqtt_client/mqtt_server_client.dart';
 import 'package:solarencrypt/pages/sensors_page.dart';
 
 import 'welcome_page.dart';
@@ -19,18 +14,6 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  // late MqttService mqttService;
-
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   final MqttServerClient client =
-  //       MqttServerClient('localhost', ''); // Use MqttServerClient
-  //   client.port = 1883; // Port number
-  //   mqttService = MqttService(client: client, topic: 'sensor_data');
-  //   mqttService.connect();
-  // }
-
   final user = FirebaseAuth.instance.currentUser!;
 
   @override
@@ -39,6 +22,16 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         title: const Text('Home'),
         backgroundColor: Color.fromARGB(255, 223, 107, 30),
+        titleSpacing: 00.0,
+        centerTitle: true,
+        toolbarHeight: 60.2,
+        toolbarOpacity: 0.8,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+              bottomRight: Radius.circular(25),
+              bottomLeft: Radius.circular(25)),
+        ),
+        elevation: 0.00,
       ),
       drawer: NavigationDrawer(user: user),
       body: Center(
@@ -47,27 +40,6 @@ class _HomePageState extends State<HomePage> {
           children: [
             Text('Welcome, ${user.email}!'),
             SizedBox(height: 20),
-            // StreamBuilder<String>(
-            //   stream: mqttService
-            //       .mqttDataStream, // Replace with your MQTT data stream
-            //   builder: (context, snapshot) {
-            //     if (snapshot.hasData) {
-            //       print('Received data: ${snapshot.data}');
-            //       Map<String, dynamic> data = jsonDecode(snapshot.data!);
-            //       temperature = data['temperature'].toString();
-            //       humidity = data['humidity'].toString();
-
-            //       return Column(
-            //         children: [
-            //           Text('Temperature: $temperature°C'),
-            //           Text('Humidity: $humidity%'),
-            //         ],
-            //       );
-            //     } else {
-            //       return Text('Waiting for data...');
-            //     }
-            //   },
-            // ),
           ],
         ),
       ),
