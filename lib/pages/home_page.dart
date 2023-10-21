@@ -2,6 +2,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:solarencrypt/pages/chat_page.dart';
 import 'package:solarencrypt/pages/sensors_page.dart';
 
 import 'welcome_page.dart';
@@ -122,7 +123,7 @@ class _HomePageState extends State<HomePage> {
                 onTap: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => SensorsPage()),
+                    MaterialPageRoute(builder: (context) => ChatPage()),
                   );
                 },
                 child: Container(
@@ -138,7 +139,7 @@ class _HomePageState extends State<HomePage> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: const [
                         Icon(
-                          Icons.solar_power,
+                          Icons.chat,
                           color: Colors.white,
                           size: 70,
                         ),
@@ -146,7 +147,7 @@ class _HomePageState extends State<HomePage> {
                         Padding(
                           padding: EdgeInsets.symmetric(horizontal: 20),
                           child: Text(
-                            'Connect to your solar panel',
+                            'Chat with users',
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: 15,
@@ -209,6 +210,9 @@ class NavigationDrawer extends StatelessWidget {
 
   Widget buildHeader(BuildContext context) => Material(
         color: Color.fromARGB(255, 53, 52, 52),
+        borderRadius: const BorderRadius.only(
+          bottomRight: Radius.circular(20.0),
+        ),
         child: InkWell(
           onTap: () {
             Navigator.pop(context);
@@ -220,10 +224,12 @@ class NavigationDrawer extends StatelessWidget {
               children: [
                 CircleAvatar(
                   radius: 42,
-                  backgroundImage: NetworkImage(
-                      'https://img.freepik.com/free-photo/waist-up-portrait-handsome-serious-unshaven-male-keeps-hands-together-dressed-dark-blue-shirt-has-talk-with-interlocutor-stands-against-white-wall-self-confident-man-freelancer_273609-16320.jpg'),
+                  // backgroundImage: NetworkImage(
+                  //     'https://img.freepik.com/free-photo/waist-up-portrait-handsome-serious-unshaven-male-keeps-hands-together-dressed-dark-blue-shirt-has-talk-with-interlocutor-stands-against-white-wall-self-confident-man-freelancer_273609-16320.jpg'),
+                  backgroundImage: ExactAssetImage('assets/logo1.png'),
+                  backgroundColor: Color.fromARGB(255, 53, 52, 52),
                 ),
-                SizedBox(height: 20),
+                SizedBox(height: 10),
                 FutureBuilder<String?>(
                   future: fetchUsername(),
                   builder: (context, snapshot) {
@@ -242,7 +248,7 @@ class NavigationDrawer extends StatelessWidget {
                 ),
                 SizedBox(height: 10),
                 ClipRRect(
-                  borderRadius: BorderRadius.circular(30.0),
+                  borderRadius: BorderRadius.circular(20.0),
                   child: MaterialButton(
                     onPressed: () {
                       FirebaseAuth.instance.signOut();
@@ -285,7 +291,7 @@ class NavigationDrawer extends StatelessWidget {
               title: const Text('Chat'),
               onTap: () => Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (context) => WelcomePage()),
+                MaterialPageRoute(builder: (context) => ChatPage()),
               ),
             ),
             ListTile(

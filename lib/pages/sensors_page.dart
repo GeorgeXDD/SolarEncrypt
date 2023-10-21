@@ -1,9 +1,10 @@
-// ignore_for_file: sort_child_properties_last
+// ignore_for_file: sort_child_properties_last, unused_local_variable, prefer_interpolation_to_compose_strings, prefer_const_constructors, deprecated_member_use
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:solarencrypt/pages/chat_page.dart';
 import 'package:solarencrypt/pages/welcome_page.dart';
 
 import '../services/MQTTAppState.dart';
@@ -187,8 +188,8 @@ class _SensorsPageState extends State<SensorsPage> {
       }
     }
 
-    if (dataWidgets.length > 3) {
-      dataWidgets = dataWidgets.sublist(dataWidgets.length - 3);
+    if (dataWidgets.length > 4) {
+      dataWidgets = dataWidgets.sublist(dataWidgets.length - 4);
     }
 
     return Padding(
@@ -302,13 +303,12 @@ class NavigationDrawer extends StatelessWidget {
             ),
             child: Column(
               children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(100.0),
-                  child: const CircleAvatar(
-                    radius: 42,
-                    backgroundImage: NetworkImage(
-                        'https://img.freepik.com/free-photo/waist-up-portrait-handsome-serious-unshaven-male-keeps-hands-together-dressed-dark-blue-shirt-has-talk-with-interlocutor-stands-against-white-wall-self-confident-man-freelancer_273609-16320.jpg'),
-                  ),
+                CircleAvatar(
+                  radius: 42,
+                  // backgroundImage: NetworkImage(
+                  //     'https://img.freepik.com/free-photo/waist-up-portrait-handsome-serious-unshaven-male-keeps-hands-together-dressed-dark-blue-shirt-has-talk-with-interlocutor-stands-against-white-wall-self-confident-man-freelancer_273609-16320.jpg'),
+                  backgroundImage: ExactAssetImage('assets/logo1.png'),
+                  backgroundColor: Color.fromARGB(255, 53, 52, 52),
                 ),
                 const SizedBox(height: 20),
                 FutureBuilder<String?>(
@@ -328,7 +328,7 @@ class NavigationDrawer extends StatelessWidget {
                 ),
                 const SizedBox(height: 10),
                 ClipRRect(
-                  borderRadius: BorderRadius.circular(30.0),
+                  borderRadius: BorderRadius.circular(20.0),
                   child: MaterialButton(
                     onPressed: () {
                       FirebaseAuth.instance.signOut();
@@ -369,7 +369,7 @@ class NavigationDrawer extends StatelessWidget {
                 title: const Text('Chat'),
                 onTap: () => Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(builder: (context) => const WelcomePage()),
+                  MaterialPageRoute(builder: (context) => const ChatPage()),
                 ),
               ),
               ClipRRect(

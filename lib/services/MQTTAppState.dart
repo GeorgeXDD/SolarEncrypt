@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_interpolation_to_compose_strings
+
 import 'package:flutter/cupertino.dart';
 
 enum MQTTAppConnectionState { connected, disconnected, connecting }
@@ -20,8 +22,8 @@ class MQTTAppState with ChangeNotifier {
   }
 
   void clearHistoryText() {
-    _historyText = ''; // Clear the history text
-    notifyListeners(); // Notify listeners to update the UI
+    _historyText = '';
+    notifyListeners();
   }
 
   String get getReceivedText => _receivedText;
