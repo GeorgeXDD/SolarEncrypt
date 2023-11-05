@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:solarencrypt/pages/control_page.dart';
 import 'package:solarencrypt/pages/home_page.dart';
 import 'package:solarencrypt/pages/sensors_page.dart';
 import 'package:solarencrypt/pages/welcome_page.dart';
@@ -23,75 +24,104 @@ class _ChatPageState extends State<ChatPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Chat'),
-        backgroundColor: const Color.fromARGB(255, 223, 107, 30),
-        titleSpacing: 00.0,
-        centerTitle: true,
-        toolbarHeight: 60.2,
-        toolbarOpacity: 0.8,
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.only(
-              bottomRight: Radius.circular(25),
-              bottomLeft: Radius.circular(25)),
+        appBar: AppBar(
+          title: const Text('Chat'),
+          backgroundColor: const Color.fromARGB(255, 223, 107, 30),
+          titleSpacing: 00.0,
+          centerTitle: true,
+          toolbarHeight: 60.2,
+          toolbarOpacity: 0.8,
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.only(
+                bottomRight: Radius.circular(25),
+                bottomLeft: Radius.circular(25)),
+          ),
+          elevation: 0.00,
         ),
-        elevation: 0.00,
-      ),
-      drawer: NavigationDrawer(user: user),
-      body: Column(
-        children: [
-          Expanded(
-            child: StreamBuilder(
-              stream: chatCollection.orderBy('timestamp').snapshots(),
-              builder: (context, snapshot) {
-                if (!snapshot.hasData) {
-                  return const Center(
-                    child: CircularProgressIndicator(),
-                  );
-                }
-                final messages = snapshot.data?.docs;
-                List<Widget> messageWidgets = [];
-                for (var message in messages!) {
-                  final messageText = message['text'];
-                  final messageSender = message['sender'];
-                  final messageWidget = MessageWidget(
-                    text: messageText,
-                    sender: messageSender,
-                    isMe: user.email == messageSender,
-                  );
-                  messageWidgets.insert(0, messageWidget);
-                }
-                return ListView(
-                  reverse: true, // Reverse the ListView
-                  children: messageWidgets,
-                );
-              },
+        drawer: NavigationDrawer(user: user),
+        body: Stack(children: [
+          ColorFiltered(
+            colorFilter: ColorFilter.mode(
+              Colors.transparent,
+              BlendMode.srcOver,
+            ),
+            child: Image.asset(
+              'assets/logo1transp.png',
+              fit: BoxFit.cover,
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: messageController,
-                    decoration: const InputDecoration(
-                      hintText: 'Type your message...',
-                    ),
-                  ),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.send),
-                  onPressed: () {
-                    sendMessage();
+          Column(
+            children: [
+              Expanded(
+                child: StreamBuilder(
+                  stream: chatCollection.orderBy('timestamp').snapshots(),
+                  builder: (context, snapshot) {
+                    if (!snapshot.hasData) {
+                      return const Center(
+                        child: CircularProgressIndicator(),
+                      );
+                    }
+                    final messages = snapshot.data?.docs;
+                    List<Widget> messageWidgets = [];
+                    for (var message in messages!) {
+                      final messageText = message['text'];
+                      final messageSender = message['sender'];
+                      final messageWidget = MessageWidget(
+                        text: messageText,
+                        sender: messageSender,
+                        isMe: user.email == messageSender,
+                      );
+                      messageWidgets.insert(0, messageWidget);
+                    }
+                    return ListView(
+                      reverse: true, // Reverse the ListView
+                      children: messageWidgets,
+                    );
                   },
                 ),
-              ],
-            ),
+              ),
+              Container(
+                margin: EdgeInsets.only(bottom: 10.0),
+                child: Container(
+                  width: 400,
+                  decoration: BoxDecoration(
+                    color: Color.fromARGB(255, 53, 52, 52),
+                    borderRadius: BorderRadius.circular(20.0),
+                  ),
+                  padding: EdgeInsets.all(8.0),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          controller: messageController,
+                          style: TextStyle(color: Colors.white),
+                          decoration: InputDecoration(
+                            hintText: 'Type your message...',
+                            hintStyle: TextStyle(color: Colors.white70),
+                            border: InputBorder.none,
+                          ),
+                        ),
+                      ),
+                      Container(
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Color.fromARGB(255, 53, 52, 52),
+                        ),
+                        child: IconButton(
+                          icon: Icon(Icons.send),
+                          color: Colors.white,
+                          onPressed: () {
+                            sendMessage();
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              )
+            ],
           ),
-        ],
-      ),
-    );
+        ]));
   }
 
   void sendMessage() {
@@ -142,7 +172,8 @@ class MessageWidget extends StatelessWidget {
                       username,
                       style: const TextStyle(
                         fontSize: 12,
-                        color: Colors.black,
+                        color: Color.fromARGB(255, 53, 52, 52),
+                        fontWeight: FontWeight.bold,
                       ),
                     );
                   },
@@ -301,7 +332,10 @@ class NavigationDrawer extends StatelessWidget {
             ListTile(
               leading: const Icon(Icons.control_camera),
               title: const Text('Control Panel'),
-              onTap: () {},
+              onTap: () => Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => ControlPage()),
+              ),
             ),
             ListTile(
               leading: const Icon(Icons.radar),

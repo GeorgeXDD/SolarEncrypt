@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:solarencrypt/pages/chat_page.dart';
+import 'package:solarencrypt/pages/control_page.dart';
 import 'package:solarencrypt/pages/welcome_page.dart';
 
 import '../services/MQTTAppState.dart';
@@ -389,7 +390,10 @@ class NavigationDrawer extends StatelessWidget {
               ListTile(
                 leading: const Icon(Icons.control_camera),
                 title: const Text('Control Panel'),
-                onTap: () {},
+                onTap: () => Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => ControlPage()),
+                ),
               ),
               ListTile(
                 leading: const Icon(Icons.radar),

@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:solarencrypt/pages/chat_page.dart';
+import 'package:solarencrypt/pages/control_page.dart';
 import 'package:solarencrypt/pages/sensors_page.dart';
 
 import 'welcome_page.dart';
@@ -70,10 +71,14 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
           SizedBox(height: 20),
-          Image.asset(
-            'assets/solarpanel_home2.jpg',
-            width: double.infinity,
-            height: 200,
+          ClipRRect(
+            borderRadius:
+                BorderRadius.circular(70.0), // Adjust the radius as needed
+            child: Image.asset(
+              'assets/solarpanel_home2.jpg',
+              width: double.infinity,
+              height: 200,
+            ),
           ),
           SizedBox(height: 30),
           Row(
@@ -305,7 +310,10 @@ class NavigationDrawer extends StatelessWidget {
             ListTile(
               leading: const Icon(Icons.control_camera),
               title: const Text('Control Panel'),
-              onTap: () {},
+              onTap: () => Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => ControlPage()),
+              ),
             ),
             ListTile(
               leading: const Icon(Icons.radar),
