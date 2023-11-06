@@ -3,14 +3,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:solarencrypt/pages/chat_page.dart';
 import 'package:solarencrypt/pages/control_page.dart';
 import 'package:solarencrypt/pages/radar_local_area_page.dart';
 import 'package:solarencrypt/pages/welcome_page.dart';
-
-import '../services/MQTTAppState.dart';
-import '../services/MQTTManager.dart';
+import 'package:mqtt_client/mqtt_client.dart';
+import 'package:mqtt_client/mqtt_server_client.dart';
 import 'home_page.dart';
 
 class SensorsPage extends StatefulWidget {
@@ -20,29 +18,86 @@ class SensorsPage extends StatefulWidget {
 
 class _SensorsPageState extends State<SensorsPage> {
   final user = FirebaseAuth.instance.currentUser!;
-  final TextEditingController _hostTextController = TextEditingController();
-  final TextEditingController _topicTextController = TextEditingController();
-  late MQTTAppState currentAppState;
-  List<MQTTManager> managers = [];
+  late MqttServerClient client;
+  String receivedDataCPU = '0';
+  String receivedDataVoltage = '0';
+  String receivedDataCurrent = '0';
+  String receivedDataRPM = '0';
+
+  final List<ExpansionPanelItem> _expansionPanelItems = [
+    ExpansionPanelItem(
+      headerText: 'External panel 1',
+      buttons: ['CPU', 'Voltage', 'Current', 'RPM'],
+      isExpanded: false,
+    ),
+    ExpansionPanelItem(
+      headerText: 'External panel 2',
+      buttons: ['CPU', 'Voltage', 'Current', 'RPM'],
+      isExpanded: false,
+    ),
+  ];
 
   @override
   void initState() {
     super.initState();
+    client = MqttServerClient('test.mosquitto.org', '');
+    connect();
   }
 
   @override
   void dispose() {
-    _disconnect();
-    _hostTextController.dispose();
-    _topicTextController.dispose();
+    client.disconnect();
     super.dispose();
+  }
+
+  void connect() async {
+    client.logging(on: true);
+    client.onConnected = onConnected;
+
+    final connMessage = MqttConnectMessage()
+        .withClientIdentifier('flutter_client')
+        .startClean()
+        .keepAliveFor(60)
+        .withWillQos(MqttQos.atLeastOnce);
+
+    client.connectionMessage = connMessage;
+
+    try {
+      await client.connect();
+    } catch (e) {
+      print('Exception: $e');
+      client.disconnect();
+    }
+  }
+
+  void onConnected() {
+    client.subscribe('test/sensors/cpu', MqttQos.atMostOnce);
+    client.subscribe('test/sensors/voltage', MqttQos.atMostOnce);
+    client.subscribe('test/sensors/current', MqttQos.atMostOnce);
+    client.subscribe('test/sensors/rpm', MqttQos.atMostOnce);
+
+    client.updates!.listen((List<MqttReceivedMessage<MqttMessage>> c) {
+      final MqttPublishMessage recMess = c[0].payload as MqttPublishMessage;
+      final String newMessage =
+          MqttPublishPayload.bytesToStringAsString(recMess.payload.message);
+      final String topic = c[0].topic;
+
+      setState(() {
+        if (topic == 'test/sensors/cpu') {
+          receivedDataCPU = newMessage;
+        } else if (topic == 'test/sensors/voltage') {
+          receivedDataVoltage = newMessage;
+        } else if (topic == 'test/sensors/current') {
+          receivedDataCurrent = newMessage;
+        } else if (topic == 'test/sensors/rpm') {
+          receivedDataRPM = newMessage;
+        }
+      });
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    final MQTTAppState appState = Provider.of<MQTTAppState>(context);
-    currentAppState = appState;
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Sensors Page'),
@@ -59,13 +114,130 @@ class _SensorsPageState extends State<SensorsPage> {
         elevation: 0.00,
       ),
       drawer: NavigationDrawer(user: user),
-      body: ListView(
-        children: <Widget>[
-          // _buildConnectionStateText(
-          //     _prepareStateMessageFrom(currentAppState.getAppConnectionState)),
-          _buildEditableColumn(),
-          _buildScrollableTextWith(currentAppState.getHistoryText),
-        ],
+      body: SingleChildScrollView(
+        child: Center(
+          child: Column(
+            // mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              SizedBox(height: 20),
+              Text(
+                'My panel data',
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  buildContainer('CPU', receivedDataCPU),
+                  SizedBox(width: 20),
+                  buildContainer('Voltage', receivedDataVoltage),
+                ],
+              ),
+              SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  buildContainer('Current', receivedDataCurrent),
+                  SizedBox(width: 20),
+                  buildContainer('RPM', receivedDataRPM),
+                ],
+              ),
+              SizedBox(height: 20),
+              Text(
+                'Other panels sample data',
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 20),
+              ExpansionPanelList(
+                expansionCallback: (int index, bool isExpanded) {
+                  setState(() {
+                    _expansionPanelItems[index].isExpanded = !isExpanded;
+                  });
+                },
+                children: _expansionPanelItems
+                    .map<ExpansionPanel>((ExpansionPanelItem item) {
+                  return ExpansionPanel(
+                    headerBuilder: (BuildContext context, bool isExpanded) {
+                      return GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            item.isExpanded = !isExpanded;
+                          });
+                        },
+                        child: Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Text(item.headerText),
+                        ),
+                      );
+                    },
+                    body: Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: (item.buttons).map<Widget>((button) {
+                          return buildSmallContainer(button, '0');
+                        }).toList(),
+                      ),
+                    ),
+                    isExpanded: item.isExpanded,
+                  );
+                }).toList(),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget buildContainer(String title, String data) {
+    return Container(
+      width: 150,
+      height: 80,
+      decoration: BoxDecoration(
+        color: const Color.fromARGB(255, 223, 107, 30),
+        borderRadius: BorderRadius.circular(15),
+      ),
+      alignment: Alignment.center,
+      child: Text(
+        '$title: $data',
+        style: TextStyle(fontSize: 20, color: Colors.white),
+        textAlign: TextAlign.center,
+      ),
+    );
+  }
+
+  Widget buildSmallContainer(String title, String data) {
+    String value = '';
+
+    switch (title) {
+      case 'CPU':
+        value = '70.0*C';
+        break;
+      case 'Voltage':
+        value = '5.0 V';
+        break;
+      case 'Current':
+        value = '2.0 A';
+        break;
+      case 'RPM':
+        value = '1000';
+        break;
+    }
+
+    return Container(
+      width: 80,
+      height: 50,
+      margin: EdgeInsets.all(5),
+      decoration: BoxDecoration(
+        color: const Color.fromARGB(255, 53, 52, 52),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      alignment: Alignment.center,
+      child: Text(
+        '$title: $value',
+        style: TextStyle(fontSize: 14, color: Colors.white),
+        textAlign: TextAlign.center,
       ),
     );
   }
@@ -82,183 +254,18 @@ class _SensorsPageState extends State<SensorsPage> {
 
     return null;
   }
+}
 
-  Widget _buildEditableColumn() {
-    return Padding(
-      padding: const EdgeInsets.all(20.0),
-      child: Column(
-        children: <Widget>[
-          const SizedBox(height: 10),
-          _buildTextFieldWith(
-              _topicTextController,
-              'Enter a topic to subscribe or listen',
-              currentAppState.getAppConnectionState),
-          const SizedBox(height: 10),
-          _buildConnectionButtons(currentAppState.getAppConnectionState),
-        ],
-      ),
-    );
-  }
+class ExpansionPanelItem {
+  final String headerText;
+  final List<String> buttons;
+  bool isExpanded;
 
-  Widget _buildConnectionButtons(MQTTAppConnectionState state) {
-    return Row(
-      children: <Widget>[
-        Expanded(
-          child: ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              primary: Colors.lightBlueAccent,
-            ),
-            child: Text(state == MQTTAppConnectionState.disconnected
-                ? 'Connect'
-                : 'Connecting...'),
-            onPressed: state == MQTTAppConnectionState.disconnected
-                ? _configureAndConnect
-                : null,
-          ),
-        ),
-        const SizedBox(width: 10),
-        Expanded(
-          child: ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              primary: Colors.redAccent,
-            ),
-            child: const Text('Disconnect'),
-            onPressed:
-                state == MQTTAppConnectionState.connecting ? _disconnect : null,
-          ),
-        ),
-      ],
-    );
-  }
-
-  // Widget _buildConnectionStateText(String status) {
-  //   return Row(
-  //     children: <Widget>[
-  //       Expanded(
-  //         child: Container(
-  //             color: Colors.deepOrangeAccent,
-  //             child: Text(status, textAlign: TextAlign.center)),
-  //       ),
-  //     ],
-  //   );
-  // }
-
-  Widget _buildTextFieldWith(TextEditingController controller, String hintText,
-      MQTTAppConnectionState state) {
-    bool shouldEnable = false;
-    if ((controller == _hostTextController ||
-            controller == _topicTextController) &&
-        state == MQTTAppConnectionState.disconnected) {
-      shouldEnable = true;
-    }
-    return TextField(
-      enabled: shouldEnable,
-      controller: controller,
-      decoration: InputDecoration(
-        contentPadding:
-            const EdgeInsets.only(left: 0, bottom: 0, top: 0, right: 0),
-        labelText: hintText,
-      ),
-    );
-  }
-
-  Widget _buildScrollableTextWith(String text) {
-    List<Widget> dataWidgets = [];
-
-    List<String> lines = text.split('\n');
-
-    for (String line in lines) {
-      if (line.trim().isNotEmpty) {
-        dataWidgets.add(
-          Container(
-            width: 400,
-            height: 60,
-            margin: const EdgeInsets.symmetric(vertical: 5),
-            decoration: BoxDecoration(
-              color: const Color.fromARGB(255, 223, 107, 30),
-              border: Border.all(color: Colors.black),
-              borderRadius: BorderRadius.circular(5),
-            ),
-            child: Center(
-              child: Text(
-                line,
-                style: const TextStyle(fontSize: 18, color: Colors.white),
-              ),
-            ),
-          ),
-        );
-      }
-    }
-
-    if (dataWidgets.length > 4) {
-      dataWidgets = dataWidgets.sublist(dataWidgets.length - 4);
-    }
-
-    return Padding(
-      padding: const EdgeInsets.all(20.0),
-      child: Column(
-        children: <Widget>[
-          SingleChildScrollView(
-            child: Column(
-              children: dataWidgets.isNotEmpty
-                  ? dataWidgets
-                  : [const Text('No data')],
-            ),
-          ),
-          const SizedBox(height: 20),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              primary: const Color.fromARGB(255, 223, 107, 30),
-            ),
-            onPressed: _clearHistoryText,
-            child: const Text('Clear History'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _clearHistoryText() {
-    currentAppState.clearHistoryText();
-  }
-
-  String _prepareStateMessageFrom(MQTTAppConnectionState state) {
-    switch (state) {
-      case MQTTAppConnectionState.connected:
-        return 'Connected';
-      case MQTTAppConnectionState.connecting:
-        return 'Connecting';
-      case MQTTAppConnectionState.disconnected:
-        return 'Disconnected';
-    }
-  }
-
-  void _configureAndConnect() {
-    String host = _hostTextController.text;
-    String topic = 'test/' + _topicTextController.text + '/current';
-
-    MQTTManager manager = MQTTManager(state: currentAppState);
-
-    manager.initializeMQTTClient(topic: topic, identifier: 'identifier');
-
-    managers.add(manager);
-
-    _connectAllManagers();
-
-    currentAppState.setAppConnectionState(MQTTAppConnectionState.connecting);
-  }
-
-  void _connectAllManagers() async {
-    for (var manager in managers) {
-      await manager.connectAll();
-    }
-  }
-
-  void _disconnect() {
-    for (var manager in managers) {
-      manager.disconnectAll();
-    }
-  }
+  ExpansionPanelItem({
+    required this.headerText,
+    required this.buttons,
+    this.isExpanded = false,
+  });
 }
 
 class NavigationDrawer extends StatelessWidget {

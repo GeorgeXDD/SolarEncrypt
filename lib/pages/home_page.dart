@@ -81,7 +81,7 @@ class _HomePageState extends State<HomePage> {
               height: 200,
             ),
           ),
-          SizedBox(height: 30),
+          SizedBox(height: 20),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -93,9 +93,9 @@ class _HomePageState extends State<HomePage> {
                   );
                 },
                 child: Container(
-                  margin: EdgeInsets.only(left: 30),
-                  width: 150,
-                  height: 150,
+                  margin: EdgeInsets.only(left: 50),
+                  width: 120,
+                  height: 120,
                   decoration: BoxDecoration(
                     color: Color.fromARGB(255, 223, 107, 30),
                     borderRadius: BorderRadius.circular(20),
@@ -107,7 +107,7 @@ class _HomePageState extends State<HomePage> {
                         Icon(
                           Icons.solar_power,
                           color: Colors.white,
-                          size: 70,
+                          size: 50,
                         ),
                         SizedBox(height: 10),
                         Padding(
@@ -116,7 +116,7 @@ class _HomePageState extends State<HomePage> {
                             'Connect to your solar panel',
                             style: TextStyle(
                               color: Colors.white,
-                              fontSize: 15,
+                              fontSize: 12,
                             ),
                           ),
                         ),
@@ -133,9 +133,9 @@ class _HomePageState extends State<HomePage> {
                   );
                 },
                 child: Container(
-                  margin: EdgeInsets.only(right: 30),
-                  width: 150,
-                  height: 150,
+                  margin: EdgeInsets.only(right: 50),
+                  width: 120,
+                  height: 120,
                   decoration: BoxDecoration(
                     color: Color.fromARGB(255, 223, 107, 30),
                     borderRadius: BorderRadius.circular(20),
@@ -147,7 +147,7 @@ class _HomePageState extends State<HomePage> {
                         Icon(
                           Icons.chat,
                           color: Colors.white,
-                          size: 70,
+                          size: 50,
                         ),
                         SizedBox(height: 10),
                         Padding(
@@ -156,7 +156,7 @@ class _HomePageState extends State<HomePage> {
                             'Chat with users',
                             style: TextStyle(
                               color: Colors.white,
-                              fontSize: 15,
+                              fontSize: 12,
                             ),
                           ),
                         ),
@@ -230,8 +230,6 @@ class NavigationDrawer extends StatelessWidget {
               children: [
                 CircleAvatar(
                   radius: 42,
-                  // backgroundImage: NetworkImage(
-                  //     'https://img.freepik.com/free-photo/waist-up-portrait-handsome-serious-unshaven-male-keeps-hands-together-dressed-dark-blue-shirt-has-talk-with-interlocutor-stands-against-white-wall-self-confident-man-freelancer_273609-16320.jpg'),
                   backgroundImage: ExactAssetImage('assets/logo1.png'),
                   backgroundColor: Color.fromARGB(255, 53, 52, 52),
                 ),

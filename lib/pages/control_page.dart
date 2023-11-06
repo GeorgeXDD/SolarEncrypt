@@ -25,7 +25,7 @@ class ControlPage extends StatefulWidget {
 class _ControlPageState extends State<ControlPage> {
   final MqttServerClient client =
       MqttServerClient('test.mosquitto.org', 'MotorControl');
-  final String topic = 'test/solar2';
+  final String topic = 'test/solar';
   final String sensorTopic = 'test/sensors/current';
   final user = FirebaseAuth.instance.currentUser!;
   bool isManualMode = true;
@@ -109,7 +109,13 @@ class _ControlPageState extends State<ControlPage> {
             ElevatedButton(
               onPressed: () {
                 setState(() {
-                  isManualMode = !isManualMode;
+                  if (isManualMode) {
+                    isManualMode = !isManualMode;
+                    publishMessage('AutomaticMode');
+                  } else if (!isManualMode) {
+                    isManualMode = !isManualMode;
+                    publishMessage('ManualMode');
+                  }
                 });
               },
               style: ElevatedButton.styleFrom(
