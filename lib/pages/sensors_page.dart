@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:solarencrypt/pages/chat_page.dart';
 import 'package:solarencrypt/pages/control_page.dart';
+import 'package:solarencrypt/pages/radar_local_area_page.dart';
 import 'package:solarencrypt/pages/welcome_page.dart';
 
 import '../services/MQTTAppState.dart';
@@ -398,7 +399,10 @@ class NavigationDrawer extends StatelessWidget {
               ListTile(
                 leading: const Icon(Icons.radar),
                 title: const Text('Radar local area'),
-                onTap: () {},
+                onTap: () => Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => RadarLocalAreaPage()),
+                ),
               ),
             ],
           ),

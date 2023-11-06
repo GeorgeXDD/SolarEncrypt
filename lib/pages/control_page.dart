@@ -8,6 +8,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:mqtt_client/mqtt_client.dart';
 import 'package:mqtt_client/mqtt_server_client.dart';
 import 'package:solarencrypt/pages/home_page.dart';
+import 'package:solarencrypt/pages/radar_local_area_page.dart';
 import 'package:solarencrypt/pages/sensors_page.dart';
 import 'package:solarencrypt/pages/welcome_page.dart';
 import 'package:typed_data/src/typed_buffer.dart';
@@ -23,8 +24,9 @@ class ControlPage extends StatefulWidget {
 
 class _ControlPageState extends State<ControlPage> {
   final MqttServerClient client =
-      MqttServerClient('test.mosquitto.org', 'your_client_id');
-  final String topic = 'solar/current';
+      MqttServerClient('test.mosquitto.org', 'MotorControl');
+  final String topic = 'test/solar2';
+  final String sensorTopic = 'test/sensors/current';
   final user = FirebaseAuth.instance.currentUser!;
   bool isManualMode = true;
 
@@ -34,9 +36,15 @@ class _ControlPageState extends State<ControlPage> {
     setupMqtt();
   }
 
+  @override
+  void dispose() {
+    client.disconnect();
+    super.dispose();
+  }
+
   Future<void> setupMqtt() async {
     final MqttConnectMessage connMess = MqttConnectMessage()
-        .withClientIdentifier('your_client_id')
+        .withClientIdentifier('MotorControl')
         .startClean()
         .keepAliveFor(60)
         .withWillTopic('will-topic')
@@ -47,7 +55,13 @@ class _ControlPageState extends State<ControlPage> {
 
     try {
       await client.connect();
-      client.subscribe(topic, MqttQos.atLeastOnce);
+      if (client.connectionStatus!.state == MqttConnectionState.connected) {
+        print('MQTT client connected');
+        client.subscribe(topic, MqttQos.atLeastOnce);
+        client.subscribe(sensorTopic, MqttQos.atLeastOnce);
+      } else {
+        print('MQTT client connection failed');
+      }
     } catch (e) {
       print('Exception: $e');
     }
@@ -79,13 +93,19 @@ class _ControlPageState extends State<ControlPage> {
               bottomRight: Radius.circular(25),
               bottomLeft: Radius.circular(25)),
         ),
-        elevation: 0.00,
+        elevation: 5.00,
       ),
       drawer: NavigationDrawer(user: user),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: [
+          children: <Widget>[
+            SizedBox(height: 30),
+            Text(
+              'Press the button to change the power mode',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
                 setState(() {
@@ -99,9 +119,11 @@ class _ControlPageState extends State<ControlPage> {
                   borderRadius: BorderRadius.circular(20.0),
                 ),
               ),
-              child: Text(isManualMode
-                  ? 'Switch to Automatic Mode'
-                  : 'Switch to Manual Mode'),
+              child: Text(
+                isManualMode
+                    ? 'Switch to Automatic Mode'
+                    : 'Switch to Manual Mode',
+              ),
             ),
             SizedBox(height: 30),
             Visibility(
@@ -113,30 +135,40 @@ class _ControlPageState extends State<ControlPage> {
                     children: [
                       ElevatedButton(
                         onPressed: () {
-                          publishMessage('W');
+                          publishMessage('w');
                         },
                         style: ElevatedButton.styleFrom(
                           primary: const Color.fromARGB(255, 223, 107, 30),
-                          minimumSize: Size(100, 60),
+                          minimumSize: Size(150, 70),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(20.0),
                           ),
                         ),
-                        child: const Icon(Icons.undo),
+                        child: Column(
+                          children: [
+                            Icon(Icons.undo),
+                            Text('Forward'),
+                          ],
+                        ),
                       ),
                       SizedBox(width: 10),
                       ElevatedButton(
                         onPressed: () {
-                          publishMessage('S');
+                          publishMessage('s');
                         },
                         style: ElevatedButton.styleFrom(
                           primary: const Color.fromARGB(255, 223, 107, 30),
-                          minimumSize: Size(100, 60),
+                          minimumSize: Size(150, 70),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(20.0),
                           ),
                         ),
-                        child: const Icon(Icons.redo),
+                        child: Column(
+                          children: [
+                            Icon(Icons.redo),
+                            Text('Backward'),
+                          ],
+                        ),
                       ),
                     ],
                   ),
@@ -146,35 +178,209 @@ class _ControlPageState extends State<ControlPage> {
                     children: [
                       ElevatedButton(
                         onPressed: () {
-                          publishMessage('A');
+                          publishMessage('a');
                         },
                         style: ElevatedButton.styleFrom(
                           primary: const Color.fromARGB(255, 223, 107, 30),
-                          minimumSize: Size(100, 60),
+                          minimumSize: Size(150, 70),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(20.0),
                           ),
                         ),
-                        child: const Icon(Icons.rotate_left),
+                        child: Column(
+                          children: [
+                            Icon(Icons.rotate_left),
+                            Text('Rotate Left'),
+                          ],
+                        ),
                       ),
                       SizedBox(width: 10),
                       ElevatedButton(
                         onPressed: () {
-                          publishMessage('D');
+                          publishMessage('d');
                         },
                         style: ElevatedButton.styleFrom(
                           primary: const Color.fromARGB(255, 223, 107, 30),
-                          minimumSize: Size(100, 60),
+                          minimumSize: Size(150, 70),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(20.0),
                           ),
                         ),
-                        child: const Icon(Icons.rotate_right),
+                        child: Column(
+                          children: [
+                            Icon(Icons.rotate_right),
+                            Text('Rotate Right'),
+                          ],
+                        ),
                       ),
                     ],
                   ),
                 ],
               ),
+            ),
+            Expanded(child: SensorsWidget(client)),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class SensorsWidget extends StatefulWidget {
+  final MqttServerClient client;
+
+  SensorsWidget(this.client);
+
+  @override
+  _SensorsWidgetState createState() => _SensorsWidgetState();
+}
+
+class _SensorsWidgetState extends State<SensorsWidget> {
+  late MqttServerClient client;
+  String receivedDataCPU = '';
+  String receivedDataVoltage = '';
+  String receivedDataCurrent = '';
+  String receivedDataRPM = '';
+
+  @override
+  void initState() {
+    super.initState();
+    client = widget.client;
+    connect();
+  }
+
+  @override
+  void dispose() {
+    client.disconnect();
+    super.dispose();
+  }
+
+  void connect() async {
+    client.logging(on: true);
+    client.onConnected = onConnected;
+
+    final connMessage = MqttConnectMessage()
+        .withClientIdentifier('flutter_client')
+        .startClean()
+        .keepAliveFor(60)
+        .withWillQos(MqttQos.atLeastOnce);
+
+    client.connectionMessage = connMessage;
+
+    try {
+      await client.connect();
+    } catch (e) {
+      print('Exception: $e');
+      client.disconnect();
+    }
+  }
+
+  void onConnected() {
+    client.subscribe('test/sensors/cpu', MqttQos.atMostOnce);
+    client.subscribe('test/sensors/voltage', MqttQos.atMostOnce);
+    client.subscribe('test/sensors/current', MqttQos.atMostOnce);
+    client.subscribe('test/sensors/rpm', MqttQos.atMostOnce);
+
+    client.updates!.listen((List<MqttReceivedMessage<MqttMessage>> c) {
+      final MqttPublishMessage recMess = c[0].payload as MqttPublishMessage;
+      final String newMessage =
+          MqttPublishPayload.bytesToStringAsString(recMess.payload.message);
+      final String topic = c[0].topic;
+
+      setState(() {
+        if (topic == 'test/sensors/cpu') {
+          receivedDataCPU = newMessage;
+        } else if (topic == 'test/sensors/voltage') {
+          receivedDataVoltage = newMessage;
+        } else if (topic == 'test/sensors/current') {
+          receivedDataCurrent = newMessage;
+        } else if (topic == 'test/sensors/rpm') {
+          receivedDataRPM = newMessage;
+        }
+      });
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Text(
+              'Sensors Data',
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Container(
+                  width: 150,
+                  height: 80,
+                  decoration: BoxDecoration(
+                    color: const Color.fromARGB(255, 53, 52, 52),
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  alignment: Alignment.center,
+                  child: Text(
+                    'CPU: $receivedDataCPU',
+                    style: TextStyle(fontSize: 20, color: Colors.white),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+                SizedBox(width: 20),
+                Container(
+                  width: 150,
+                  height: 80,
+                  decoration: BoxDecoration(
+                    color: const Color.fromARGB(255, 53, 52, 52),
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  alignment: Alignment.center,
+                  child: Text(
+                    'Voltage: $receivedDataVoltage',
+                    style: TextStyle(fontSize: 20, color: Colors.white),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Container(
+                  width: 150,
+                  height: 80,
+                  decoration: BoxDecoration(
+                    color: const Color.fromARGB(255, 53, 52, 52),
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  alignment: Alignment.center,
+                  child: Text(
+                    'Current: $receivedDataCurrent',
+                    style: TextStyle(fontSize: 20, color: Colors.white),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+                SizedBox(width: 20),
+                Container(
+                  width: 150,
+                  height: 80,
+                  decoration: BoxDecoration(
+                    color: const Color.fromARGB(255, 53, 52, 52),
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  alignment: Alignment.center,
+                  child: Text(
+                    'RPM: $receivedDataRPM',
+                    style: TextStyle(fontSize: 20, color: Colors.white),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ],
             ),
           ],
         ),
@@ -317,7 +523,10 @@ class NavigationDrawer extends StatelessWidget {
             ListTile(
               leading: const Icon(Icons.radar),
               title: const Text('Radar local area'),
-              onTap: () {},
+              onTap: () => Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => RadarLocalAreaPage()),
+              ),
             ),
           ],
         ),

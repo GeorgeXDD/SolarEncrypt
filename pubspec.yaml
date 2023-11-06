@@ -44,6 +44,21 @@ dependencies:
   cloud_firestore: ^4.8.4
   mqtt_client: ^10.0.0
   flutter_mqtt: ^1.0.0+5
+  flutter_map: any
+  geocoding: any
+  flutter_geocoder: any
+  tuple: any
+  latlong2: any
+  positioned_tap_detector_2: any
+  transparent_image: any
+  async: any
+  flutter_image: any
+  vector_math: any
+  proj4dart: any
+  meta: any
+  collection: any
+
+
 
 dev_dependencies:
   flutter_test:

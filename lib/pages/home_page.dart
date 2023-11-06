@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:solarencrypt/pages/chat_page.dart';
 import 'package:solarencrypt/pages/control_page.dart';
+import 'package:solarencrypt/pages/radar_local_area_page.dart';
 import 'package:solarencrypt/pages/sensors_page.dart';
 
 import 'welcome_page.dart';
@@ -318,7 +319,10 @@ class NavigationDrawer extends StatelessWidget {
             ListTile(
               leading: const Icon(Icons.radar),
               title: const Text('Radar local area'),
-              onTap: () {},
+              onTap: () => Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => RadarLocalAreaPage()),
+              ),
             ),
           ],
         ),
