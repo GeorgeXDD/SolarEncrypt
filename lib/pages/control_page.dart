@@ -243,10 +243,10 @@ class SensorsWidget extends StatefulWidget {
 
 class _SensorsWidgetState extends State<SensorsWidget> {
   late MqttServerClient client;
-  String receivedDataCPU = '';
-  String receivedDataVoltage = '';
-  String receivedDataCurrent = '';
-  String receivedDataRPM = '';
+  String receivedDataCPU = '0';
+  String receivedDataVoltage = '0';
+  String receivedDataCurrent = '0';
+  String receivedDataTemp = '0';
 
   @override
   void initState() {
@@ -285,7 +285,7 @@ class _SensorsWidgetState extends State<SensorsWidget> {
     client.subscribe('test/sensors/cpu', MqttQos.atMostOnce);
     client.subscribe('test/sensors/voltage', MqttQos.atMostOnce);
     client.subscribe('test/sensors/current', MqttQos.atMostOnce);
-    client.subscribe('test/sensors/rpm', MqttQos.atMostOnce);
+    client.subscribe('test/sensors/temp', MqttQos.atMostOnce);
 
     client.updates!.listen((List<MqttReceivedMessage<MqttMessage>> c) {
       final MqttPublishMessage recMess = c[0].payload as MqttPublishMessage;
@@ -300,8 +300,8 @@ class _SensorsWidgetState extends State<SensorsWidget> {
           receivedDataVoltage = newMessage;
         } else if (topic == 'test/sensors/current') {
           receivedDataCurrent = newMessage;
-        } else if (topic == 'test/sensors/rpm') {
-          receivedDataRPM = newMessage;
+        } else if (topic == 'test/sensors/temp') {
+          receivedDataTemp = newMessage;
         }
       });
     });
@@ -381,7 +381,7 @@ class _SensorsWidgetState extends State<SensorsWidget> {
                   ),
                   alignment: Alignment.center,
                   child: Text(
-                    'RPM: $receivedDataRPM',
+                    'Temp: $receivedDataTemp',
                     style: TextStyle(fontSize: 20, color: Colors.white),
                     textAlign: TextAlign.center,
                   ),

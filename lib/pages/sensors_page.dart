@@ -22,17 +22,17 @@ class _SensorsPageState extends State<SensorsPage> {
   String receivedDataCPU = '0';
   String receivedDataVoltage = '0';
   String receivedDataCurrent = '0';
-  String receivedDataRPM = '0';
+  String receivedDataTemp = '0';
 
   final List<ExpansionPanelItem> _expansionPanelItems = [
     ExpansionPanelItem(
       headerText: 'External panel 1',
-      buttons: ['CPU', 'Voltage', 'Current', 'RPM'],
+      buttons: ['CPU', 'Voltage', 'Current', 'Temp'],
       isExpanded: false,
     ),
     ExpansionPanelItem(
       headerText: 'External panel 2',
-      buttons: ['CPU', 'Voltage', 'Current', 'RPM'],
+      buttons: ['CPU', 'Voltage', 'Current', 'Temp'],
       isExpanded: false,
     ),
   ];
@@ -74,7 +74,7 @@ class _SensorsPageState extends State<SensorsPage> {
     client.subscribe('test/sensors/cpu', MqttQos.atMostOnce);
     client.subscribe('test/sensors/voltage', MqttQos.atMostOnce);
     client.subscribe('test/sensors/current', MqttQos.atMostOnce);
-    client.subscribe('test/sensors/rpm', MqttQos.atMostOnce);
+    client.subscribe('test/sensors/temp', MqttQos.atMostOnce);
 
     client.updates!.listen((List<MqttReceivedMessage<MqttMessage>> c) {
       final MqttPublishMessage recMess = c[0].payload as MqttPublishMessage;
@@ -89,8 +89,8 @@ class _SensorsPageState extends State<SensorsPage> {
           receivedDataVoltage = newMessage;
         } else if (topic == 'test/sensors/current') {
           receivedDataCurrent = newMessage;
-        } else if (topic == 'test/sensors/rpm') {
-          receivedDataRPM = newMessage;
+        } else if (topic == 'test/sensors/temp') {
+          receivedDataTemp = newMessage;
         }
       });
     });
@@ -139,7 +139,7 @@ class _SensorsPageState extends State<SensorsPage> {
                 children: <Widget>[
                   buildContainer('Current', receivedDataCurrent),
                   SizedBox(width: 20),
-                  buildContainer('RPM', receivedDataRPM),
+                  buildContainer('Temp', receivedDataTemp),
                 ],
               ),
               SizedBox(height: 20),
@@ -220,8 +220,8 @@ class _SensorsPageState extends State<SensorsPage> {
       case 'Current':
         value = '2.0 A';
         break;
-      case 'RPM':
-        value = '1000';
+      case 'Temp':
+        value = '20';
         break;
     }
 
@@ -236,7 +236,7 @@ class _SensorsPageState extends State<SensorsPage> {
       alignment: Alignment.center,
       child: Text(
         '$title: $value',
-        style: TextStyle(fontSize: 14, color: Colors.white),
+        style: TextStyle(fontSize: 12, color: Colors.white),
         textAlign: TextAlign.center,
       ),
     );

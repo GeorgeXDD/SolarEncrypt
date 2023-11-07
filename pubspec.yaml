@@ -44,7 +44,7 @@ dependencies:
   cloud_firestore: ^4.8.4
   mqtt_client: ^10.0.0
   flutter_mqtt: ^1.0.0+5
-  flutter_map: any
+  flutter_map: ^6.0.1
   geocoding: any
   flutter_geocoder: any
   tuple: any
@@ -57,6 +57,10 @@ dependencies:
   proj4dart: any
   meta: any
   collection: any
+  fl_chart: ^0.40.0
+  geolocator: ^7.6.2
+  sunrise_sunset_calc: ^3.0.0
+  countries_world_map: ^1.1.1
 
 
 
