@@ -2,41 +2,29 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:solarencrypt/pages/chat_page.dart';
 import 'package:solarencrypt/pages/control_page.dart';
 import 'package:solarencrypt/pages/radar_local_area_page.dart';
 import 'package:solarencrypt/pages/welcome_page.dart';
-import 'package:solarencrypt/pages/earnings_page.dart';
+import 'package:solarencrypt/pages/sensors_page.dart';
 import 'package:mqtt_client/mqtt_client.dart';
 import 'package:mqtt_client/mqtt_server_client.dart';
 import 'home_page.dart';
 
-class SensorsPage extends StatefulWidget {
+class EarningsPage extends StatefulWidget {
   @override
-  _SensorsPageState createState() => _SensorsPageState();
+  _EarningsPageState createState() => _EarningsPageState();
 }
 
-class _SensorsPageState extends State<SensorsPage> {
+class _EarningsPageState extends State<EarningsPage> {
   final user = FirebaseAuth.instance.currentUser!;
   late MqttServerClient client;
-  String receivedDataCPU = '60.0°C';
-  String receivedDataVoltage = '5.1 V';
-  String receivedDataCurrent = '2.2 A';
-  String receivedDataTemp = '19';
-
-  final List<ExpansionPanelItem> _expansionPanelItems = [
-    ExpansionPanelItem(
-      headerText: 'External panel 1',
-      buttons: ['CPU', 'Voltage', 'Current', 'Temp'],
-      isExpanded: false,
-    ),
-    ExpansionPanelItem(
-      headerText: 'External panel 2',
-      buttons: ['CPU', 'Voltage', 'Current', 'Temp'],
-      isExpanded: false,
-    ),
-  ];
+  String receivedDataMNR = '0.007864 MNR';
+  String receivedDataVPN = '10.56 GB';
+  String receivedDataStorage = '256 GB';
+  String receivedDataRate = '+0.000001';
 
   @override
   void initState() {
@@ -72,10 +60,10 @@ class _SensorsPageState extends State<SensorsPage> {
   }
 
   void onConnected() {
-    client.subscribe('test/sensors/cpu', MqttQos.atMostOnce);
-    client.subscribe('test/sensors/voltage', MqttQos.atMostOnce);
-    client.subscribe('test/sensors/current', MqttQos.atMostOnce);
-    client.subscribe('test/sensors/temp', MqttQos.atMostOnce);
+    client.subscribe('test/sensors/mnr', MqttQos.atMostOnce);
+    client.subscribe('test/sensors/vpn', MqttQos.atMostOnce);
+    client.subscribe('test/sensors/storage', MqttQos.atMostOnce);
+    client.subscribe('test/sensors/rate', MqttQos.atMostOnce);
 
     client.updates!.listen((List<MqttReceivedMessage<MqttMessage>> c) {
       final MqttPublishMessage recMess = c[0].payload as MqttPublishMessage;
@@ -85,13 +73,13 @@ class _SensorsPageState extends State<SensorsPage> {
 
       setState(() {
         if (topic == 'test/sensors/cpu') {
-          receivedDataCPU = newMessage;
+          receivedDataMNR = newMessage;
         } else if (topic == 'test/sensors/voltage') {
-          receivedDataVoltage = newMessage;
+          receivedDataVPN = newMessage;
         } else if (topic == 'test/sensors/current') {
-          receivedDataCurrent = newMessage;
-        } else if (topic == 'test/sensors/temp') {
-          receivedDataTemp = newMessage;
+          receivedDataStorage = newMessage;
+        } else if (topic == 'test/sensors/rate') {
+          receivedDataRate = newMessage;
         }
       });
     });
@@ -101,7 +89,7 @@ class _SensorsPageState extends State<SensorsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Sensors Page'),
+        title: const Text('Earnings Page'),
         backgroundColor: const Color.fromARGB(255, 223, 107, 30),
         titleSpacing: 00.0,
         centerTitle: true,
@@ -122,68 +110,53 @@ class _SensorsPageState extends State<SensorsPage> {
             children: <Widget>[
               SizedBox(height: 20),
               Text(
-                'My panel data',
+                'My earnings',
                 style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
               SizedBox(height: 20),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  buildContainer('CPU', receivedDataCPU),
+                  buildContainer('Cryptocurrency', receivedDataMNR),
                   SizedBox(width: 20),
-                  buildContainer('Voltage', receivedDataVoltage),
+                  buildContainer('VPN', receivedDataVPN),
                 ],
               ),
               SizedBox(height: 20),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  buildContainer('Current', receivedDataCurrent),
+                  buildContainer('Storage', receivedDataStorage),
                   SizedBox(width: 20),
-                  buildContainer('Temp', receivedDataTemp),
+                  buildContainer('Rate', receivedDataRate),
                 ],
               ),
-              SizedBox(height: 20),
-              Text(
-                'Other panels sample data',
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              SizedBox(height: 40),
+              Container(
+                child: Text(
+                  'Last 7 days earnings rate',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Color.fromARGB(255, 53, 52, 52),
+                  ),
+                ),
+              ),
+              SizedBox(height: 10),
+              AspectRatio(
+                aspectRatio: 1.70,
+                child: Padding(
+                  padding: const EdgeInsets.only(
+                    right: 18,
+                    left: 12,
+                    top: 24,
+                    bottom: 12,
+                  ),
+                  child: LineChart(
+                    mainData(),
+                  ),
+                ),
               ),
               SizedBox(height: 20),
-              ExpansionPanelList(
-                expansionCallback: (int index, bool isExpanded) {
-                  setState(() {
-                    _expansionPanelItems[index].isExpanded = !isExpanded;
-                  });
-                },
-                children: _expansionPanelItems
-                    .map<ExpansionPanel>((ExpansionPanelItem item) {
-                  return ExpansionPanel(
-                    headerBuilder: (BuildContext context, bool isExpanded) {
-                      return GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            item.isExpanded = !isExpanded;
-                          });
-                        },
-                        child: Padding(
-                          padding: EdgeInsets.all(8.0),
-                          child: Text(item.headerText),
-                        ),
-                      );
-                    },
-                    body: Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: (item.buttons).map<Widget>((button) {
-                          return buildSmallContainer(button, '0');
-                        }).toList(),
-                      ),
-                    ),
-                    isExpanded: item.isExpanded,
-                  );
-                }).toList(),
-              ),
             ],
           ),
         ),
@@ -193,7 +166,7 @@ class _SensorsPageState extends State<SensorsPage> {
 
   Widget buildContainer(String title, String data) {
     return Container(
-      width: 150,
+      width: 180,
       height: 80,
       decoration: BoxDecoration(
         color: const Color.fromARGB(255, 223, 107, 30),
@@ -208,38 +181,43 @@ class _SensorsPageState extends State<SensorsPage> {
     );
   }
 
-  Widget buildSmallContainer(String title, String data) {
-    String value = '';
-
-    switch (title) {
-      case 'CPU':
-        value = '70.0*C';
-        break;
-      case 'Voltage':
-        value = '5.0 V';
-        break;
-      case 'Current':
-        value = '2.0 A';
-        break;
-      case 'Temp':
-        value = '20';
-        break;
-    }
-
-    return Container(
-      width: 80,
-      height: 50,
-      margin: EdgeInsets.all(5),
-      decoration: BoxDecoration(
-        color: const Color.fromARGB(255, 53, 52, 52),
-        borderRadius: BorderRadius.circular(10),
+  LineChartData mainData() {
+    return LineChartData(
+      gridData: FlGridData(show: true),
+      titlesData: FlTitlesData(
+        show: true,
+        leftTitles: SideTitles(
+          showTitles: true,
+        ),
+        bottomTitles: SideTitles(showTitles: true),
+        rightTitles: SideTitles(showTitles: false),
+        topTitles: SideTitles(showTitles: false),
       ),
-      alignment: Alignment.center,
-      child: Text(
-        '$title: $value',
-        style: TextStyle(fontSize: 12, color: Colors.white),
-        textAlign: TextAlign.center,
-      ),
+      borderData: FlBorderData(
+          show: true,
+          border: Border.all(color: const Color.fromARGB(255, 223, 107, 30))),
+      minX: 1,
+      maxX: 7,
+      minY: 0,
+      maxY: 0.000002,
+      lineBarsData: [
+        LineChartBarData(
+          spots: [
+            FlSpot(1, 0.000001),
+            FlSpot(2, 0.0000009),
+            FlSpot(3, 0.0000012),
+            FlSpot(4, 0.000001),
+            FlSpot(5, 0.000001),
+            FlSpot(6, 0.0000011),
+            FlSpot(7, 0.000001),
+          ],
+          isCurved: true,
+          colors: [const Color.fromARGB(255, 223, 107, 30)],
+          barWidth: 2,
+          isStrokeCapRound: true,
+          belowBarData: BarAreaData(show: false),
+        )
+      ],
     );
   }
 
@@ -255,18 +233,6 @@ class _SensorsPageState extends State<SensorsPage> {
 
     return null;
   }
-}
-
-class ExpansionPanelItem {
-  final String headerText;
-  final List<String> buttons;
-  bool isExpanded;
-
-  ExpansionPanelItem({
-    required this.headerText,
-    required this.buttons,
-    this.isExpanded = false,
-  });
 }
 
 class NavigationDrawer extends StatelessWidget {
@@ -382,18 +348,12 @@ class NavigationDrawer extends StatelessWidget {
                   MaterialPageRoute(builder: (context) => const ChatPage()),
                 ),
               ),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(20.0),
-                child: Container(
-                  color: Color.fromARGB(255, 223, 107, 30),
-                  child: ListTile(
-                    leading: const Icon(Icons.workspaces_outline),
-                    title: const Text('Sensors'),
-                    onTap: () => Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(builder: (context) => SensorsPage()),
-                    ),
-                  ),
+              ListTile(
+                leading: const Icon(Icons.workspaces_outline),
+                title: const Text('Sensors'),
+                onTap: () => Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => SensorsPage()),
                 ),
               ),
               ListTile(
@@ -412,12 +372,18 @@ class NavigationDrawer extends StatelessWidget {
                   MaterialPageRoute(builder: (context) => RadarLocalAreaPage()),
                 ),
               ),
-              ListTile(
-                leading: const Icon(Icons.money),
-                title: const Text('Earnings Page'),
-                onTap: () => Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => EarningsPage()),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(20.0),
+                child: Container(
+                  color: Color.fromARGB(255, 223, 107, 30),
+                  child: ListTile(
+                    leading: const Icon(Icons.money),
+                    title: const Text('Earnings'),
+                    onTap: () => Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (context) => EarningsPage()),
+                    ),
+                  ),
                 ),
               ),
             ],

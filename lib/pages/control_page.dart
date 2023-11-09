@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_const_constructors
+// ignore_for_file: prefer_const_constructors, implementation_imports, depend_on_referenced_packages
 
 import 'dart:typed_data';
 
@@ -11,6 +11,7 @@ import 'package:solarencrypt/pages/home_page.dart';
 import 'package:solarencrypt/pages/radar_local_area_page.dart';
 import 'package:solarencrypt/pages/sensors_page.dart';
 import 'package:solarencrypt/pages/welcome_page.dart';
+import 'package:solarencrypt/pages/earnings_page.dart';
 import 'package:typed_data/src/typed_buffer.dart';
 
 import 'chat_page.dart';
@@ -243,10 +244,10 @@ class SensorsWidget extends StatefulWidget {
 
 class _SensorsWidgetState extends State<SensorsWidget> {
   late MqttServerClient client;
-  String receivedDataCPU = '0';
-  String receivedDataVoltage = '0';
-  String receivedDataCurrent = '0';
-  String receivedDataTemp = '0';
+  String receivedDataCPU = '60.3°C';
+  String receivedDataVoltage = '5.2 V';
+  String receivedDataCurrent = '2.3 A';
+  String receivedDataTemp = '20';
 
   @override
   void initState() {
@@ -532,6 +533,14 @@ class NavigationDrawer extends StatelessWidget {
               onTap: () => Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(builder: (context) => RadarLocalAreaPage()),
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.money),
+              title: const Text('Earnings Page'),
+              onTap: () => Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => EarningsPage()),
               ),
             ),
           ],

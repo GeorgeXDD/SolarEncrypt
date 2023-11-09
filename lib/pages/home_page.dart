@@ -8,6 +8,7 @@ import 'package:solarencrypt/pages/chat_page.dart';
 import 'package:solarencrypt/pages/control_page.dart';
 import 'package:solarencrypt/pages/radar_local_area_page.dart';
 import 'package:solarencrypt/pages/sensors_page.dart';
+import 'package:solarencrypt/pages/earnings_page.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'welcome_page.dart';
 
@@ -279,7 +280,10 @@ class _HomePageState extends State<HomePage> {
       gridData: FlGridData(show: true),
       titlesData: FlTitlesData(
         show: true,
-        leftTitles: SideTitles(showTitles: true),
+        leftTitles: SideTitles(
+          showTitles: true,
+          reservedSize: 30,
+        ),
         bottomTitles: SideTitles(showTitles: true),
         rightTitles: SideTitles(showTitles: false),
         topTitles: SideTitles(showTitles: false),
@@ -335,7 +339,7 @@ class _ArchedLineAnimationState extends State<ArchedLineAnimation>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   DateTime currentTime = DateTime.now();
-  DateTime customDateTime = DateTime(2023, 11, 7, 15, 10, 0);
+  DateTime customDateTime = DateTime(2023, 11, 7, 11, 00, 0);
 
   @override
   void initState() {
@@ -557,6 +561,14 @@ class NavigationDrawer extends StatelessWidget {
               onTap: () => Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(builder: (context) => RadarLocalAreaPage()),
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.money),
+              title: const Text('Earnings Page'),
+              onTap: () => Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => EarningsPage()),
               ),
             ),
           ],

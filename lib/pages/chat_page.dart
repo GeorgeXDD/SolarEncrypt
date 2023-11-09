@@ -8,6 +8,7 @@ import 'package:solarencrypt/pages/home_page.dart';
 import 'package:solarencrypt/pages/radar_local_area_page.dart';
 import 'package:solarencrypt/pages/sensors_page.dart';
 import 'package:solarencrypt/pages/welcome_page.dart';
+import 'package:solarencrypt/pages/earnings_page.dart';
 
 class ChatPage extends StatefulWidget {
   const ChatPage({Key? key}) : super(key: key);
@@ -344,6 +345,14 @@ class NavigationDrawer extends StatelessWidget {
               onTap: () => Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(builder: (context) => RadarLocalAreaPage()),
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.money),
+              title: const Text('Earnings Page'),
+              onTap: () => Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => EarningsPage()),
               ),
             ),
           ],

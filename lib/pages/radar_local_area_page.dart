@@ -10,6 +10,7 @@ import 'package:solarencrypt/pages/control_page.dart';
 import 'package:solarencrypt/pages/home_page.dart';
 import 'package:solarencrypt/pages/sensors_page.dart';
 import 'package:solarencrypt/pages/welcome_page.dart';
+import 'package:solarencrypt/pages/earnings_page.dart';
 import 'package:geolocator/geolocator.dart';
 
 class RadarLocalAreaPage extends StatefulWidget {
@@ -310,6 +311,14 @@ class NavigationDrawer extends StatelessWidget {
                         builder: (context) => RadarLocalAreaPage()),
                   ),
                 ),
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.money),
+              title: const Text('Earnings Page'),
+              onTap: () => Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => EarningsPage()),
               ),
             ),
           ],
