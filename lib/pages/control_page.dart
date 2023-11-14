@@ -244,7 +244,7 @@ class SensorsWidget extends StatefulWidget {
 
 class _SensorsWidgetState extends State<SensorsWidget> {
   late MqttServerClient client;
-  String receivedDataCPU = '60.3°C';
+  String receivedDataCPU = '60.3';
   String receivedDataVoltage = '5.2 V';
   String receivedDataCurrent = '2.3 A';
   String receivedDataTemp = '20';
@@ -332,7 +332,7 @@ class _SensorsWidgetState extends State<SensorsWidget> {
                   ),
                   alignment: Alignment.center,
                   child: Text(
-                    'CPU: $receivedDataCPU',
+                    'CPU: $receivedDataCPU°C',
                     style: TextStyle(fontSize: 20, color: Colors.white),
                     textAlign: TextAlign.center,
                   ),
@@ -382,7 +382,7 @@ class _SensorsWidgetState extends State<SensorsWidget> {
                   ),
                   alignment: Alignment.center,
                   child: Text(
-                    'Temp: $receivedDataTemp',
+                    'Temp: $receivedDataTemp°C',
                     style: TextStyle(fontSize: 20, color: Colors.white),
                     textAlign: TextAlign.center,
                   ),

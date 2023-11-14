@@ -20,7 +20,7 @@ class SensorsPage extends StatefulWidget {
 class _SensorsPageState extends State<SensorsPage> {
   final user = FirebaseAuth.instance.currentUser!;
   late MqttServerClient client;
-  String receivedDataCPU = '60.0°C';
+  String receivedDataCPU = '60.0';
   String receivedDataVoltage = '5.1 V';
   String receivedDataCurrent = '2.2 A';
   String receivedDataTemp = '19';
@@ -129,7 +129,7 @@ class _SensorsPageState extends State<SensorsPage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  buildContainer('CPU', receivedDataCPU),
+                  buildContainer('CPU', receivedDataCPU + '°C'),
                   SizedBox(width: 20),
                   buildContainer('Voltage', receivedDataVoltage),
                 ],
@@ -140,7 +140,7 @@ class _SensorsPageState extends State<SensorsPage> {
                 children: <Widget>[
                   buildContainer('Current', receivedDataCurrent),
                   SizedBox(width: 20),
-                  buildContainer('Temp', receivedDataTemp),
+                  buildContainer('Temp', receivedDataTemp + '°C'),
                 ],
               ),
               SizedBox(height: 20),

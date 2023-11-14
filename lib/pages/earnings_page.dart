@@ -204,7 +204,7 @@ class _EarningsPageState extends State<EarningsPage> {
         LineChartBarData(
           spots: [
             FlSpot(1, 0.000001),
-            FlSpot(2, 0.0000009),
+            FlSpot(2, 0.0000011),
             FlSpot(3, 0.0000012),
             FlSpot(4, 0.000001),
             FlSpot(5, 0.000001),
